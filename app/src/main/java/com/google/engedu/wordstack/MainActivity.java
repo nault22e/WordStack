@@ -19,6 +19,7 @@ import android.content.res.AssetManager;
 import android.graphics.Color;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.DragEvent;
 import android.view.MotionEvent;
 import android.view.View;
@@ -41,9 +42,10 @@ public class MainActivity extends AppCompatActivity {
     public static final int LIGHT_BLUE = Color.rgb(176, 200, 255);
     public static final int LIGHT_GREEN = Color.rgb(200, 255, 200);
     private ArrayList<String> words = new ArrayList<>();
-    private Random random = new Random();
+    private Random rand = new Random();
     private StackedLayout stackedLayout;
     private String word1, word2;
+    private static final String TAG = "WordStack";
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -56,6 +58,9 @@ public class MainActivity extends AppCompatActivity {
             String line = null;
             while((line = in.readLine()) != null) {
                 String word = line.trim();
+                if(word.length() == WORD_LENGTH){
+                    words.add(word);
+                }
                 /**
                  **
                  **  YOUR CODE GOES HERE
@@ -141,6 +146,19 @@ public class MainActivity extends AppCompatActivity {
     }
 
     public boolean onStartGame(View view) {
+        int word1Index = rand.nextInt(words.size());
+        int word2Index = rand.nextInt(words.size());
+
+        while(word1Index == word2Index){
+            word2Index = rand.nextInt(words.size());
+        }
+
+        word1 = words.get(word1Index);
+        word2 = words.get(word2Index);
+
+        String scrambledWord = scramble(word1, word2);
+        Log.i(TAG, word1+ " + " + " + " + word2 + " + " + scrambledWord);
+
         TextView messageBox = (TextView) findViewById(R.id.message_box);
         messageBox.setText("Game started");
         /**
@@ -148,7 +166,43 @@ public class MainActivity extends AppCompatActivity {
          **  YOUR CODE GOES HERE
          **
          **/
+
         return true;
+    }
+
+    //Returns scrambled version of the two words, preserving the letter order of each word
+    private String scramble(String w1, String w2){
+        int i = 0;
+        int j = 0;
+        StringBuilder sb = new StringBuilder();
+
+        while (i < w1.length() && j < w2.length()){
+            String choice;
+            //Randomly pick a word
+            if(rand.nextBoolean()){
+                choice = word1; //Pick word 1
+                sb.append(word1.charAt(i));
+                i++;
+            }
+            else{
+                choice = word2; //Pick word 2
+                sb.append(word2.charAt(j));
+                j++;
+            }
+            //Add char at that index to the string builder
+            //Increment the corresponding index
+        }
+
+        //Add remaining letters from the word that has not been completed
+        if (i < word1.length()) {
+            sb.append(word1.toCharArray(), i, word1.length()-i);
+        }
+        else {
+            sb.append(word2.toCharArray(), j, word2.length()-j);
+
+        }
+
+        return sb.toString();
     }
 
     public boolean onUndo(View view) {

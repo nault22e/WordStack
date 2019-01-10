@@ -35,6 +35,8 @@ public class StackedLayout extends LinearLayout {
          **  YOUR CODE GOES HERE
          **
          **/
+
+        tiles.push(tile);
     }
 
     public View pop() {
